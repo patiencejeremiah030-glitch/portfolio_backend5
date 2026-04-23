@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Projects | Portfolio</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 60px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            color: white;
+            margin-bottom: 16px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 1.25rem;
+            color: rgba(255,255,255,0.85);
+            font-weight: 400;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 10px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15), 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-card:hover .project-image {
+            transform: scale(1.05);
+        }
+
+        .project-content {
+            padding: 32px;
+        }
+
+        .project-title {
+            font-size: 1.75rem;
+            color: #1a202c;
+            margin-bottom: 12px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .project-description {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 28px;
+            font-size: 0.95rem;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .project-link {
+            flex: 1;
+            text-align: center;
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .live-link {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .live-link:hover {
+            background: linear-gradient(135deg, #0d7a72 0%, #2dd46a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(56, 239, 125, 0.35);
+        }
+
+        .github-link {
+            background: #2d3748;
+            color: white;
+        }
+
+        .github-link:hover {
+            background: #4a5568;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(45, 55, 72, 0.35);
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+            backdrop-filter: blur(8px);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 80px;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .back-link a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.05rem;
+            padding: 14px 32px;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            border-radius: 30px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .back-link a:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 40px 16px;
+            }
+
+            .header {
+                margin-bottom: 50px;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .header p {
+                font-size: 1.1rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .project-card {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+            .project-content {
+                padding: 24px;
+            }
+
+            .project-title {
+                font-size: 1.5rem;
+            }
+
+            .project-links {
+                flex-direction: column;
+            }
+
+            .back-link {
+                margin-top: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-code"></i> My Projects</h1>
+            <p>Explore my latest work and creative endeavors</p>
+        </div>
+
+        <div class="projects-grid">
+            {% for project in projects %}
+            <div class="project-card" onclick="window.open('{{ project.live_link }}', '_blank')">
+                {% if project.is_featured %}
+                <div class="featured-badge">
+                    <i class="fas fa-star"></i> Featured
+                </div>
+                {% endif %}
+                
+                <img src="{{ project.image.url }}?v=2" alt="{{ project.title }}" class="project-image">
+                
+                <div class="project-content">
+                    <h2 class="project-title">{{ project.title }}</h2>
+                    <p class="project-description">{{ project.description }}</p>
+
+                    <div class="project-links">
+                        {% if project.live_link %}
+                        <a href="{{ project.live_link }}" target="_blank" class="project-link live-link" onclick="event.stopPropagation()">
+                            <i class="fas fa-external-link-alt"></i>
+                            Live Demo
+                        </a>
+                        {% endif %}
+                        
+                        {% if project.github_link %}
+                        <a href="{{ project.github_link }}" target="_blank" class="project-link github-link" onclick="event.stopPropagation()">
+                            <i class="fab fa-github"></i>
+                            Source Code
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="back-link">
+            <a href="/">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Add smooth scrolling and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effect sound (optional)
+            const cards = document.querySelectorAll('.project-card');
+            
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                card.addEventListener('mouseenter', function() {
+                    this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                });
+            });
+
+            // Track clicks for analytics (optional)
+            const links = document.querySelectorAll('.project-link');
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    console.log('Navigating to:', this.href);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

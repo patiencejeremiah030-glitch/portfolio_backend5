@@ -1,0 +1,83 @@
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media
+/staticfiles
+/logs
+*.pot
+
+# Environment variables & Secrets (CRITICAL - NEVER COMMIT)
+.env
+.env.local
+.env.backup
+.env.*
+!.env.example
+secrets/
+keys/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.env
+
+# Node (if using frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Prevent accidental misplaced folders
+chatbotservices/
+chatbotutils/
+coreservices/
+coreutils/
+mediaabout/
+mediahome/
+mediaprofile/
+mediaprojects/
+portfolio_backendtemplates/
+usersmanagement/
+usersmanagementcommands/
+usersservices/
+usersutils/
+C:UsersUserDocumentsMy_Portfoloi*/
