@@ -43,14 +43,15 @@ else:
         }
     }
 
-# CORS settings for development
-CORS_ALLOWED_ORIGINS = [
-    os.getenv('FRONTEND_URL', 'http://localhost:3000'),
+# CORS settings for development (Vite default: 5173)
+_default_dev_origins = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'http://localhost:5173',
     'http://127.0.0.1:5173',
 ]
+_extra = [o.strip() for o in os.getenv('FRONTEND_URL', '').split(',') if o.strip()]
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys(_extra + _default_dev_origins))
 
 CORS_ALLOW_CREDENTIALS = True
 

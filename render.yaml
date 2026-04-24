@@ -1,0 +1,35 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# Create/update services from repo: Blueprints → New Blueprint Instance.
+
+databases:
+  - name: portfolio-postgres
+    plan: free
+
+services:
+  - type: web
+    name: portfolio-api
+    runtime: python
+    plan: free
+    buildCommand: bash build.sh
+    startCommand: gunicorn portfolio_backend.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4
+    healthCheckPath: /health/
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: portfolio_backend.settings.production
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: portfolio-postgres
+          property: connectionString
+      # Required before the app will boot (see portfolio_backend.settings.production).
+      - key: FRONTEND_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false

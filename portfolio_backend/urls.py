@@ -6,10 +6,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import admin_login
+from .views import admin_login, health
 from core.views_html import projects_page
 
 urlpatterns = [
+    path('health/', health, name='health'),
     # Root endpoint - Admin Login
     path('', admin_login, name='admin_login'),
 

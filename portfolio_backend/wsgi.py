@@ -11,8 +11,12 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-# Default matches manage.py; override for production, e.g.
-# DJANGO_SETTINGS_MODULE=portfolio_backend.settings.production
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolio_backend.settings.development')
+# Render sets RENDER=true; use production settings unless overridden explicitly.
+_default = (
+    'portfolio_backend.settings.production'
+    if os.environ.get('RENDER')
+    else 'portfolio_backend.settings.development'
+)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', _default)
 
 application = get_wsgi_application()

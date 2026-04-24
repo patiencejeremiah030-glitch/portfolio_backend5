@@ -16,8 +16,8 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-# Allowed hosts for Koyeb deployment
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.koyeb.app,localhost').split(',')
+# Allowed hosts (Railway / Koyeb / local); add your real hostname in .env or on the host
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.koyeb.app,.up.railway.app,localhost,127.0.0.1').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -167,9 +167,15 @@ CHATBOT_RATE_LIMIT = int(config('CHATBOT_RATE_LIMIT', default='10'))
 CHATBOT_RATE_LIMIT_PERIOD = int(config('CHATBOT_RATE_LIMIT_PERIOD', default='60'))
 
 # CSRF exemption for API endpoints (needed for tools like Insomnia/Postman)
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000').split(',')
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='http://localhost:5173,http://127.0.0.1:5173,http://localhost:8000,http://127.0.0.1:8000',
+).split(',')
 CSRF_COOKIE_HTTPONLY = False
 
-# CORS settings
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:8000').split(',')
+# CORS settings (production: set FRONTEND_URL or CORS_ALLOWED_ORIGINS on the host — see .env.example)
+CORS_ALLOWED_ORIGINS = config(
+    'CORS_ALLOWED_ORIGINS',
+    default='http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://localhost:8000',
+).split(',')
 CORS_ALLOW_CREDENTIALS = config('CORS_ALLOW_CREDENTIALS', default='True', cast=bool)
