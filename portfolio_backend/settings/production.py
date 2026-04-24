@@ -3,38 +3,11 @@ Production settings for portfolio_backend project.
 Optimized for cloud deployment (Render, Fly.io, Heroku, etc.).
 """
 
+import logging
 import os
-import sys
 from .base import *
 
-# migrate / collectstatic load full settings; FRONTEND_URL is often unset on first Render build.
-_MANAGEMENT_SUBCOMMANDS_SKIP_CORS_GATE = frozenset(
-    {
-        'migrate',
-        'collectstatic',
-        'makemigrations',
-        'showmigrations',
-        'sqlmigrate',
-        'shell',
-        'check',
-        'test',
-        'dbshell',
-        'dumpdata',
-        'loaddata',
-        'flush',
-        'inspectdb',
-        'createsuperuser',
-    }
-)
-
-
-def _is_django_management_cli() -> bool:
-    if len(sys.argv) < 2:
-        return False
-    script = str(sys.argv[0])
-    if script.endswith('manage.py') or script == 'manage.py':
-        return sys.argv[1] in _MANAGEMENT_SUBCOMMANDS_SKIP_CORS_GATE
-    return False
+logger = logging.getLogger(__name__)
 
 # Security
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
@@ -90,10 +63,12 @@ for host in ALLOWED_HOSTS:
 
 CORS_ALLOW_CREDENTIALS = True
 
-if not CORS_ALLOWED_ORIGINS and not _is_django_management_cli():
-    raise ValueError(
-        'Set FRONTEND_URL (recommended) or CORS_ALLOWED_ORIGINS to your deployed frontend origin(s), '
-        'e.g. https://app.example.com — otherwise the browser will block API requests.'
+if not CORS_ALLOWED_ORIGINS:
+    # Do not crash Gunicorn on first deploy (e.g. Blueprint env not filled yet). Browsers will
+    # get CORS failures until FRONTEND_URL or CORS_ALLOWED_ORIGINS is set to your real frontend origin(s).
+    logger.warning(
+        'FRONTEND_URL and CORS_ALLOWED_ORIGINS are unset or empty. '
+        'Set FRONTEND_URL (recommended) to your deployed frontend, e.g. https://your-app.vercel.app'
     )
 
 # CSRF: merge explicit env list with CORS origins (SPA on another origin needs both)

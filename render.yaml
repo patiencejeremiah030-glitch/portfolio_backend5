@@ -28,8 +28,8 @@ services:
         fromDatabase:
           name: portfolio-postgres
           property: connectionString
-      # Required before the app will boot (see portfolio_backend.settings.production).
+      # Replace with your real deployed frontend origin (comma-separated for several).
       - key: FRONTEND_URL
-        sync: false
+        value: "https://127.0.0.1:5173"
       - key: OPENAI_API_KEY
         sync: false
