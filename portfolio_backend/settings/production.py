@@ -4,7 +4,37 @@ Optimized for cloud deployment (Render, Fly.io, Heroku, etc.).
 """
 
 import os
+import sys
 from .base import *
+
+# migrate / collectstatic load full settings; FRONTEND_URL is often unset on first Render build.
+_MANAGEMENT_SUBCOMMANDS_SKIP_CORS_GATE = frozenset(
+    {
+        'migrate',
+        'collectstatic',
+        'makemigrations',
+        'showmigrations',
+        'sqlmigrate',
+        'shell',
+        'check',
+        'test',
+        'dbshell',
+        'dumpdata',
+        'loaddata',
+        'flush',
+        'inspectdb',
+        'createsuperuser',
+    }
+)
+
+
+def _is_django_management_cli() -> bool:
+    if len(sys.argv) < 2:
+        return False
+    script = str(sys.argv[0])
+    if script.endswith('manage.py') or script == 'manage.py':
+        return sys.argv[1] in _MANAGEMENT_SUBCOMMANDS_SKIP_CORS_GATE
+    return False
 
 # Security
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
@@ -60,7 +90,7 @@ for host in ALLOWED_HOSTS:
 
 CORS_ALLOW_CREDENTIALS = True
 
-if not CORS_ALLOWED_ORIGINS:
+if not CORS_ALLOWED_ORIGINS and not _is_django_management_cli():
     raise ValueError(
         'Set FRONTEND_URL (recommended) or CORS_ALLOWED_ORIGINS to your deployed frontend origin(s), '
         'e.g. https://app.example.com — otherwise the browser will block API requests.'
