@@ -6,12 +6,10 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    _default = (
-        'portfolio_backend.settings.production'
-        if os.environ.get('RENDER')
-        else 'portfolio_backend.settings.development'
-    )
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', _default)
+    # Must be a string literal here: Vercel parses this line to detect Django settings
+    # (see https://vercel.com/docs/frameworks/full-stack/django ). Use the package
+    # entrypoint; portfolio_backend.settings.__init__ defaults to development.
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolio_backend.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

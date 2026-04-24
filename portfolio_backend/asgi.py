@@ -11,11 +11,10 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-_default = (
-    'portfolio_backend.settings.production'
-    if os.environ.get('RENDER')
-    else 'portfolio_backend.settings.development'
-)
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', _default)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolio_backend.settings')
+if (os.environ.get('RENDER') or os.environ.get('VERCEL')) and os.environ.get(
+    'DJANGO_SETTINGS_MODULE'
+) == 'portfolio_backend.settings':
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'portfolio_backend.settings.production'
 
 application = get_asgi_application()
