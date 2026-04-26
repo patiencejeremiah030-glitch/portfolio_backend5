@@ -15,7 +15,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 # Hardcoded ALLOWED_HOSTS - no underscores in domain names!
 ALLOWED_HOSTS = [
-    'portfolio-backend5-2.onrender.com',
+    'portfolio-backend5-3.onrender.com',
     'localhost',
     '127.0.0.1',
 ]
@@ -73,7 +73,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 # CSRF
 CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(
-    ['https://portfolio-backend5-2.onrender.com'] + CORS_ALLOWED_ORIGINS
+    ['https://portfolio-backend5-3.onrender.com'] + CORS_ALLOWED_ORIGINS
 ))
 
 # Trust reverse proxy
