@@ -10,14 +10,20 @@ from .base import *
 logger = logging.getLogger(__name__)
 
 # Security
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = False
 SECRET_KEY = os.getenv('SECRET_KEY')
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'portfolio_backend5-2.onrender.com').split(',') if h.strip()]
+
+# Hardcoded ALLOWED_HOSTS - no underscores in domain names!
+ALLOWED_HOSTS = [
+    'portfolio-backend5-2.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 if not SECRET_KEY:
     raise ValueError('SECRET_KEY environment variable is required in production')
 
-# Database - PostgreSQL (for platforms that provide it) or fallback to env vars
+# Database
 if os.getenv('DATABASE_URL'):
     import dj_database_url
     DATABASES = {
@@ -48,85 +54,53 @@ else:
         }
     }
 
-# CORS: prefer FRONTEND_URL (single or comma-separated); else use CORS_ALLOWED_ORIGINS from env
-_cors_from_frontend = [o.strip() for o in os.getenv('FRONTEND_URL', '').split(',') if o.strip()]
-_cors_from_env = [o.strip() for o in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if o.strip()]
-CORS_ALLOWED_ORIGINS = list(dict.fromkeys(_cors_from_frontend or _cors_from_env))
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    o.strip()
+    for o in os.getenv('FRONTEND_URL', '').split(',')
+    if o.strip()
+]
 
+# Add backend itself to CORS
 for host in ALLOWED_HOSTS:
-    host = host.strip()
-    if not host or host in ('localhost', '127.0.0.1') or host.startswith('.'):
+    if host in ('localhost', '127.0.0.1'):
         continue
-    origin = host if host.startswith('http') else f'https://{host}'
+    origin = f'https://{host}'
     if origin not in CORS_ALLOWED_ORIGINS:
         CORS_ALLOWED_ORIGINS.append(origin)
 
 CORS_ALLOW_CREDENTIALS = True
 
-if not CORS_ALLOWED_ORIGINS:
-    # Do not crash Gunicorn on first deploy (e.g. Blueprint env not filled yet). Browsers will
-    # get CORS failures until FRONTEND_URL or CORS_ALLOWED_ORIGINS is set to your real frontend origin(s).
-    logger.warning(
-        'FRONTEND_URL and CORS_ALLOWED_ORIGINS are unset or empty. '
-        'Set FRONTEND_URL (recommended) to your deployed frontend, e.g. https://your-app.vercel.app'
-    )
+# CSRF
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(
+    ['https://portfolio-backend5-2.onrender.com'] + CORS_ALLOWED_ORIGINS
+))
 
-# CSRF: merge explicit env list with CORS origins (SPA on another origin needs both)
-_csrf_extra = [o.strip() for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
-_csrf = list(dict.fromkeys(list(CSRF_TRUSTED_ORIGINS) + _csrf_extra + CORS_ALLOWED_ORIGINS))
-CSRF_TRUSTED_ORIGINS = _csrf
-
-# Trust X-Forwarded-Proto from reverse proxies (Koyeb, Render, Railway, etc.)
+# Trust reverse proxy
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
-# Security settings
+# Security headers
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
-# HTTPS settings (your hosting platform handles HTTPS termination)
-SECURE_SSL_REDIRECT = False  # Platform handles HTTPS
+# HTTPS
+SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-# WhiteNoise + static storage are already configured in base.py (do not duplicate middleware).
-
-# JSON API only in production (no browsable HTML renderer)
+# REST Framework - JSON only in production
 REST_FRAMEWORK = {
     **REST_FRAMEWORK,
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
 }
 
-# Logging: console always; file only if the logs directory is writable (some containers are read-only)
-logs_dir = BASE_DIR / 'logs'
-handlers_config = {
-    'console': {
-        'class': 'logging.StreamHandler',
-        'formatter': 'verbose',
-    },
-}
-root_handlers = ['console']
-django_handlers = ['console']
-
-try:
-    logs_dir.mkdir(parents=True, exist_ok=True)
-    log_path = logs_dir / 'django.log'
-    log_path.touch(exist_ok=True)
-    handlers_config['file'] = {
-        'class': 'logging.FileHandler',
-        'filename': str(log_path),
-        'formatter': 'verbose',
-    }
-    root_handlers = ['console', 'file']
-    django_handlers = ['console', 'file']
-except OSError:
-    pass
-
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -136,14 +110,21 @@ LOGGING = {
             'style': '{',
         },
     },
-    'handlers': handlers_config,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
     'root': {
-        'handlers': root_handlers,
+        'handlers': ['console'],
         'level': 'INFO',
     },
-    'django': {
-        'handlers': django_handlers,
-        'level': 'INFO',
-        'propagate': False,
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
 }
