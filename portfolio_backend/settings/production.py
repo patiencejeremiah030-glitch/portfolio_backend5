@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 # Security
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 SECRET_KEY = os.getenv('SECRET_KEY')
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', '').split(',') if h.strip()]
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'portfolio-backend5-1.onrender.com').split(',') if h.strip()]
 
 if not SECRET_KEY:
     raise ValueError('SECRET_KEY environment variable is required in production')
