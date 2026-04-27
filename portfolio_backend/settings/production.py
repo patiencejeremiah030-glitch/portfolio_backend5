@@ -84,14 +84,32 @@ ALLOWED_HOSTS = [
 DATABASES = _build_database_settings()
 CORS_ALLOWED_ORIGINS = _build_cors_allowed_origins(ALLOWED_HOSTS)
 
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
+CORS_ALLOW_HEADERS = [
+    'authorization',
+    'content-type',
+    'x-csrftoken',
+    'accept',
+    'origin',
+    'x-requested-with',
+]
 
 # -----------------------------------------------------------------------------
 # CSRF / proxy / security
 # -----------------------------------------------------------------------------
 
+# Fixed: was pointing to old backend5-3, now correctly points to backend5-4
 CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(
-    ['https://portfolio-backend5-3.onrender.com'] + CORS_ALLOWED_ORIGINS
+    ['https://portfolio-backend5-4.onrender.com'] + CORS_ALLOWED_ORIGINS
 ))
 
 # Trust reverse proxy
@@ -121,7 +139,6 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
 }
 
-# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
