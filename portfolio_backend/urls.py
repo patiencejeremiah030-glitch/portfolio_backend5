@@ -6,13 +6,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
 from .views import admin_login, health
 from core.views_html import projects_page
 
+def home(request):
+    return JsonResponse({"message": "Backend is live!"})
+
 urlpatterns = [
     path('health/', health, name='health'),
-    # Root endpoint - Admin Login
-    path('', admin_login, name='admin_login'),
+
+    # Root endpoint
+    path('', home, name='home'),
+
+    # Admin Login
+    path('admin-login/', admin_login, name='admin_login'),
 
     # Projects HTML page
     path('projects/', projects_page, name='projects-page'),
@@ -27,7 +35,6 @@ urlpatterns = [
 ]
 
 # Serve media files in development
-# Always serve media for admin file uploads to work
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -6,6 +6,7 @@ from django.urls import path
 from . import views
 from . import views_html
 
+
 app_name = 'core'
 
 urlpatterns = [
