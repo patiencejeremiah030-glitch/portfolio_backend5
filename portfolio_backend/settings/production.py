@@ -76,7 +76,7 @@ DEBUG = False
 SECRET_KEY = _get_required_env('SECRET_KEY')
 
 ALLOWED_HOSTS = [
-    'portfolio-backend5-3.onrender.com',
+    'portfolio-backend5-4.onrender.com',
     'localhost',
     '127.0.0.1',
 ]
