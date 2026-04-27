@@ -3,43 +3,45 @@ Production settings for portfolio_backend project.
 Optimized for cloud deployment (Render, Fly.io, Heroku, etc.).
 """
 
-import logging
 import os
 from .base import *
 
-logger = logging.getLogger(__name__)
 
-# Security
-DEBUG = False
-SECRET_KEY = os.getenv('SECRET_KEY')
+# -----------------------------------------------------------------------------
+# Environment helpers
+# -----------------------------------------------------------------------------
 
-# Hardcoded ALLOWED_HOSTS - no underscores in domain names!
-ALLOWED_HOSTS = [
-    'portfolio-backend5-3.onrender.com',
-    'localhost',
-    '127.0.0.1',
-]
+def _get_required_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise ValueError(f'{name} environment variable is required in production')
+    return value
 
-if not SECRET_KEY:
-    raise ValueError('SECRET_KEY environment variable is required in production')
 
-# Database
-if os.getenv('DATABASE_URL'):
-    import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.getenv('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
-else:
+def _get_csv_env(name: str, default: str = '') -> list[str]:
+    return [item.strip() for item in os.getenv(name, default).split(',') if item.strip()]
+
+
+def _build_database_settings() -> dict:
+    database_url = os.getenv('DATABASE_URL')
+    if database_url:
+        import dj_database_url
+
+        return {
+            'default': dj_database_url.config(
+                default=database_url,
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+
     db_name = os.getenv('DB_NAME')
     if not db_name:
         raise ValueError(
             'Production requires DATABASE_URL or DB_NAME (with DB_USER, DB_PASSWORD, DB_HOST, DB_PORT).'
         )
-    DATABASES = {
+
+    return {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': db_name,
@@ -54,24 +56,40 @@ else:
         }
     }
 
-# CORS
-CORS_ALLOWED_ORIGINS = [
-    o.strip()
-    for o in os.getenv('FRONTEND_URL', '').split(',')
-    if o.strip()
+
+def _build_cors_allowed_origins(hosts: list[str]) -> list[str]:
+    origins = _get_csv_env('FRONTEND_URL')
+    for host in hosts:
+        if host in ('localhost', '127.0.0.1'):
+            continue
+        origin = f'https://{host}'
+        if origin not in origins:
+            origins.append(origin)
+    return origins
+
+
+# -----------------------------------------------------------------------------
+# Core settings
+# -----------------------------------------------------------------------------
+
+DEBUG = False
+SECRET_KEY = _get_required_env('SECRET_KEY')
+
+ALLOWED_HOSTS = [
+    'portfolio-backend5-3.onrender.com',
+    'localhost',
+    '127.0.0.1',
 ]
 
-# Add backend itself to CORS
-for host in ALLOWED_HOSTS:
-    if host in ('localhost', '127.0.0.1'):
-        continue
-    origin = f'https://{host}'
-    if origin not in CORS_ALLOWED_ORIGINS:
-        CORS_ALLOWED_ORIGINS.append(origin)
+DATABASES = _build_database_settings()
+CORS_ALLOWED_ORIGINS = _build_cors_allowed_origins(ALLOWED_HOSTS)
 
 CORS_ALLOW_CREDENTIALS = True
 
-# CSRF
+# -----------------------------------------------------------------------------
+# CSRF / proxy / security
+# -----------------------------------------------------------------------------
+
 CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(
     ['https://portfolio-backend5-3.onrender.com'] + CORS_ALLOWED_ORIGINS
 ))
@@ -94,7 +112,10 @@ SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-# REST Framework - JSON only in production
+# -----------------------------------------------------------------------------
+# REST and logging
+# -----------------------------------------------------------------------------
+
 REST_FRAMEWORK = {
     **REST_FRAMEWORK,
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
