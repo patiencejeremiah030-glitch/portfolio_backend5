@@ -11,18 +11,18 @@ from .base import *
 # Environment helpers
 # -----------------------------------------------------------------------------
 
-def _get_required_env(name: str) -> str:
+def _get_required_env(name):
     value = os.getenv(name)
     if not value:
-        raise ValueError(f'{name} environment variable is required in production')
+        raise ValueError('{} environment variable is required in production'.format(name))
     return value
 
 
-def _get_csv_env(name: str, default: str = '') -> list:
+def _get_csv_env(name, default=''):
     return [item.strip() for item in os.getenv(name, default).split(',') if item.strip()]
 
 
-def _build_database_settings() -> dict:
+def _build_database_settings():
     database_url = os.getenv('DATABASE_URL')
     if database_url:
         import dj_database_url
