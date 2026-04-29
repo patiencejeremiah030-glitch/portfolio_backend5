@@ -76,9 +76,12 @@ DEBUG = False
 SECRET_KEY = _get_required_env('SECRET_KEY')
 
 ALLOWED_HOSTS = [
+     'portfolio-backend5-1.onrender.com',
     'portfolio-backend5-4.onrender.com',
+    '.onrender.com',  # ← this allows ALL onrender.com subdomains
     'localhost',
     '127.0.0.1',
+    
 ]
 
 DATABASES = _build_database_settings()
@@ -110,6 +113,8 @@ CORS_ALLOW_HEADERS = [
 # Fixed: was pointing to old backend5-3, now correctly points to backend5-4
 CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(
     ['https://portfolio-backend5-4.onrender.com'] + CORS_ALLOWED_ORIGINS
+    'https://portfolio-backend5-1.onrender.com',
+    'https://patience-porfolio.vercel.app',
 ))
 
 # Trust reverse proxy
