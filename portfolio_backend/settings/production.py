@@ -18,7 +18,7 @@ def _get_required_env(name: str) -> str:
     return value
 
 
-def _get_csv_env(name: str, default: str = '') -> list[str]:
+def _get_csv_env(name: str, default: str = '') -> list:
     return [item.strip() for item in os.getenv(name, default).split(',') if item.strip()]
 
 
@@ -26,7 +26,6 @@ def _build_database_settings() -> dict:
     database_url = os.getenv('DATABASE_URL')
     if database_url:
         import dj_database_url
-
         return {
             'default': dj_database_url.config(
                 default=database_url,
@@ -57,17 +56,6 @@ def _build_database_settings() -> dict:
     }
 
 
-def _build_cors_allowed_origins(hosts: list[str]) -> list[str]:
-    origins = _get_csv_env('FRONTEND_URL')
-    for host in hosts:
-        if host in ('localhost', '127.0.0.1'):
-            continue
-        origin = f'https://{host}'
-        if origin not in origins:
-            origins.append(origin)
-    return origins
-
-
 # -----------------------------------------------------------------------------
 # Core settings
 # -----------------------------------------------------------------------------
@@ -76,16 +64,19 @@ DEBUG = False
 SECRET_KEY = _get_required_env('SECRET_KEY')
 
 ALLOWED_HOSTS = [
-     'portfolio-backend5-1.onrender.com',
-    'portfolio-backend5-4.onrender.com',
-    '.onrender.com',  # ← this allows ALL onrender.com subdomains
-    'localhost',
-    '127.0.0.1',
-    
+    h.strip()
+    for h in os.getenv('ALLOWED_HOSTS', '.onrender.com').split(',')
+    if h.strip()
 ]
 
 DATABASES = _build_database_settings()
-CORS_ALLOWED_ORIGINS = _build_cors_allowed_origins(ALLOWED_HOSTS)
+
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    o.strip()
+    for o in os.getenv('FRONTEND_URL', '').split(',')
+    if o.strip()
+]
 
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
@@ -106,15 +97,12 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# -----------------------------------------------------------------------------
-# CSRF / proxy / security
-# -----------------------------------------------------------------------------
-
-# Fixed: was pointing to old backend5-3, now correctly points to backend5-4
+# CSRF
 CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(
-    ['https://portfolio-backend5-4.onrender.com'] + CORS_ALLOWED_ORIGINS
-    'https://portfolio-backend5-1.onrender.com',
-    'https://patience-porfolio.vercel.app',
+    [
+        'https://portfolio-backend5-4.onrender.com',
+        'https://patience-porfolio.vercel.app',
+    ] + CORS_ALLOWED_ORIGINS
 ))
 
 # Trust reverse proxy
